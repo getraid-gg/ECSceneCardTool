@@ -64,7 +64,11 @@ namespace ECSceneCardTool
                 OverwritePrompt = true
             };
 
-            saveDialog.ShowDialog();
+            if (saveDialog.ShowDialog() == false)
+            {
+                return;
+            }
+
             if (saveDialog.FileName != "")
             {
                 while (true)
