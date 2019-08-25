@@ -40,7 +40,7 @@ namespace ECSceneCardTool
 
         public static void OpenSceneFile(MainWindow target)
         {
-            OpenFileDialog openDialog = new OpenFileDialog()
+            var openDialog = new OpenFileDialog()
             {
                 DefaultExt = ".png",
                 Filter = "Emotion Creators Scene (*.png)|*.png"
@@ -55,7 +55,7 @@ namespace ECSceneCardTool
 
         public static void SaveCard(byte[] sceneData, CardInfo cardInfo)
         {
-            SaveFileDialog saveDialog = new SaveFileDialog()
+            var saveDialog = new SaveFileDialog()
             {
                 AddExtension = true,
                 DefaultExt = ".png",
@@ -64,7 +64,11 @@ namespace ECSceneCardTool
                 OverwritePrompt = true
             };
 
-            saveDialog.ShowDialog();
+            if (saveDialog.ShowDialog() == false)
+            {
+                return;
+            }
+
             if (saveDialog.FileName != "")
             {
                 while (true)
@@ -97,17 +101,17 @@ namespace ECSceneCardTool
             
             if (folderBrowser.SelectedPath != "")
             {
-                bool isContinuing = true;
+                var isContinuing = true;
                 foreach (CardInfo cardInfo in cards)
                 {
-                    string fileName = $"{cardInfo.Name}.png";
-                    string fullPath = Path.Combine(folderBrowser.SelectedPath, fileName);
+                    var fileName = $"{cardInfo.Name}.png";
+                    var fullPath = Path.Combine(folderBrowser.SelectedPath, fileName);
 
                     if (File.Exists(fullPath))
                     {
                         string newFileName;
                         string newFullPath;
-                        int nameNumber = 1;
+                        var nameNumber = 1;
                         do
                         {
                             newFileName = $"{cardInfo.Name} ({nameNumber}).png";
