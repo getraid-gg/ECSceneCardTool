@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ECSceneCardTool"
         mc:Ignorable="d"
-        Title="Emotion Creators Card Extractor" Height="403" Width="550" MinWidth="550" MinHeight="403">
+        Title="Emotion Creators Card Extractor" Height="403" Width="550" MinWidth="550" MinHeight="403" Icon="icons/Icon.ico">
     <Window.Resources>
         <local:IntGreaterThanConverter x:Key="IntGreaterThanConverter"/>
     </Window.Resources>
