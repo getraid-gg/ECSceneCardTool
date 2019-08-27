@@ -67,31 +67,26 @@ namespace ECSceneCardTool
 
                 var dataPosition = pngEndIndex + CharacterHeaderLength;
 
-                // There are now two chunks of data we skip over, laid out like this:
-                // int32: unused data 1 length
-                // (n-1)*int32, where n is the above length
-                // int32: unused data 2 length
-                // (n-1)*int32, where n is the above length
-                // If either length is 0, skip 1 int32 anyway
-
-                // I've seen the unused data 1 length vary
-                // some had 2 int32s with value 0
-                // others had 3 int32s - two 0 int32s and one -1 int32.
-                
-                var unusedDataCount = BitConverter.ToInt32(sceneData, dataPosition);
-                dataPosition += Math.Max(unusedDataCount, 1) * 4;
-                unusedDataCount = BitConverter.ToInt32(sceneData, dataPosition);
-                dataPosition += Math.Max(unusedDataCount, 1) * 4;
+                // The next chunk of data is just a list of package IDs the card uses preceded by its length
+                var packageIDCount = BitConverter.ToInt32(sceneData, dataPosition);
+                dataPosition += 4 + packageIDCount * 4;
 
                 var lstInfoLength = BitConverter.ToInt32(sceneData, dataPosition);
-                // Advance by one int and int we just read
+                // Advance by one int and by the int we just read
                 dataPosition += 4 + lstInfoLength;
-                var dataLength = BitConverter.ToInt32(sceneData, dataPosition);
-                // For some reason, there're 4 (always empty?) bytes after the length so we'll skip them, too
-                dataPosition += 8 + dataLength;
+                // For some reason, they have the data length written as a long
+                // even though their data should never exceed 2GB
+                var dataLength = BitConverter.ToInt64(sceneData, dataPosition);
+                if (dataLength > int.MaxValue)
+                {
+                    // If this ever happens...
+                    throw new SceneLoadException(new Exception("Character data is too large (>2GB)."));
+                }
+                // Once we're past this data chunk, we're at the end of the card file
+                var dataEnd = dataPosition + 8 + (int)dataLength;
 
                 // Yes, I'm parsing MessagePack data to find the character's name.
-                var nameIndex = FindByteSequenceIndex(sceneData, FullnameBytes, pngEndIndex, dataPosition - pngEndIndex);
+                var nameIndex = FindByteSequenceIndex(sceneData, FullnameBytes, pngEndIndex, dataEnd - pngEndIndex);
                 if (nameIndex == -1)
                 {
                     throw new SceneLoadException(new Exception("Failed to find the name index for a character card."));
@@ -128,9 +123,9 @@ namespace ECSceneCardTool
                 }
 
                 var characterName = System.Text.Encoding.UTF8.GetString(sceneData, nameIndex, nameLength);
-                cardsFound.Add(new CardInfo(characterName, characterStart, pngEndIndex, dataPosition));
+                cardsFound.Add(new CardInfo(characterName, characterStart, pngEndIndex, dataEnd));
 
-                searchIndex = dataPosition;
+                searchIndex = dataEnd;
                 // only search in place
                 characterStart = FindByteSequenceIndex(sceneData, PngSignature, searchIndex, PngSignature.Length);
             }
