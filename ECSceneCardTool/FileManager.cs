@@ -1,5 +1,6 @@
 ﻿using Microsoft.Win32;
 using Ookii.Dialogs.Wpf;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Windows;
@@ -51,6 +52,29 @@ namespace ECSceneCardTool
                 var path = openDialog.FileName;
                 LoadScene(path, target);
             }
+        }
+
+        public static byte[] OpenCharacterCard()
+        {
+            var openDialog = new OpenFileDialog()
+            {
+                DefaultExt = ".png",
+                Filter = "Emotion Creators Character (*.png)|*.png"
+            };
+
+            if (openDialog.ShowDialog() == true)
+            {
+                var path = openDialog.FileName;
+                using (var file = new FileStream(path, FileMode.Open))
+                {
+                    using (var fileReader = new BinaryReader(file))
+                    {
+                        return fileReader.ReadBytes((int)file.Length);
+                    }
+                }
+            }
+
+            return null;
         }
 
         public static void SaveCard(byte[] sceneData, CardInfo cardInfo)
@@ -169,9 +193,59 @@ namespace ECSceneCardTool
             }
         }
 
+        public static void SaveScene(byte[] sceneData)
+        {
+            var date = DateTime.Now;
+            var baseFileName = string.Format("{0}_{1:00}{2:00}_{3:00}{4:00}_{5:00}_{6:000}.png", 
+                date.Year,
+                date.Month, date.Day,
+                date.Hour, date.Minute,
+                date.Second,
+                date.Millisecond);
+
+            var saveDialog = new SaveFileDialog()
+            {
+                AddExtension = true,
+                DefaultExt = ".png",
+                Filter = "Emotion Creators Scene (*.png)|*.png",
+                FileName = baseFileName,
+                OverwritePrompt = true
+            };
+
+            if (saveDialog.ShowDialog() == false)
+            {
+                return;
+            }
+
+            if (saveDialog.FileName != "")
+            {
+                while (true)
+                {
+                    try
+                    {
+                        using (var fileStream = saveDialog.OpenFile())
+                        {
+                            fileStream.Seek(0, SeekOrigin.Begin);
+                            fileStream.Write(sceneData, 0, sceneData.Length);
+                        }
+                        break;
+                    }
+                    catch (IOException)
+                    {
+                        var result = MessageBox.Show($"Failed to open file for saving: {Path.GetFileName(saveDialog.FileName)}. Try again?",
+                            "Error", MessageBoxButton.YesNo, MessageBoxImage.Error);
+                        if (result == MessageBoxResult.No)
+                        {
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
         private static void WriteCardFile(Stream fs, byte[] data, CardInfo cardInfo)
         {
-            fs.Write(data, cardInfo.PngStartIndex, cardInfo.FileEndIndex - cardInfo.PngStartIndex);
+            fs.Write(data, cardInfo.PngStartIndex, cardInfo.FileLength);
         }
     }
 }

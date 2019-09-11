@@ -8,6 +8,7 @@
         Title="Emotion Creators Card Extractor" Height="403" Width="550" MinWidth="550" MinHeight="403" Icon="icons/Icon.ico">
     <Window.Resources>
         <local:IntGreaterThanConverter x:Key="IntGreaterThanConverter"/>
+        <local:IntRangeConverter x:Key="IntRangeConverter"/>
     </Window.Resources>
     <Grid AllowDrop="True" DragOver="Grid_DragOver" Drop="Grid_Drop" Background="#01000000">
         <Grid.ColumnDefinitions>
@@ -17,10 +18,16 @@
         </Grid.ColumnDefinitions>
         <Image x:Name="CardPreview" Margin="5,10,0,0" Height="352" VerticalAlignment="Top" Grid.Column="2" Width="252" HorizontalAlignment="Left"/>
         <ListBox x:Name="CardListBox" Margin="5,10" SelectionChanged="CardListBox_SelectionChanged" Grid.Column="1" TabIndex="3" SelectionMode="Extended"/>
-        <StackPanel HorizontalAlignment="Left" Margin="10,10,0,10" Width="100" MaxWidth="100" MinWidth="100">
-            <Button x:Name="OpenButton" Content="Open" Click="OpenButton_Click" TabIndex="0"/>
-            <Button x:Name="ExtractSelectedButton" Content="Extract Selected" TabIndex="1" Click="ExtractSelectedButton_Click" IsEnabled="{Binding SelectedItems.Count, ConverterParameter=0, Converter={StaticResource IntGreaterThanConverter}, ElementName=CardListBox, Mode=OneWay}"/>
-            <Button x:Name="ExtractAllButton" Content="Extract All" TabIndex="2" Click="ExtractAllButton_Click"/>
-        </StackPanel>
+        <Grid Width="100" Margin="10,10,5,10">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Button x:Name="OpenButton" Content="Open" Click="OpenButton_Click" TabIndex="0" Height="20" VerticalAlignment="Top" Margin="0"/>
+            <Button x:Name="ExtractSelectedButton" Content="Extract Selected" TabIndex="1" Click="ExtractSelectedButton_Click" IsEnabled="{Binding SelectedItems.Count, ConverterParameter=0, Converter={StaticResource IntGreaterThanConverter}, ElementName=CardListBox, Mode=OneWay}" Margin="0,25,0,0" Height="20" VerticalAlignment="Top"/>
+            <Button x:Name="ExtractAllButton" Content="Extract All" TabIndex="2" Click="ExtractAllButton_Click" IsEnabled="{Binding Items.Count, ConverterParameter=0, Converter={StaticResource IntGreaterThanConverter}, ElementName=CardListBox, Mode=OneWay}" Margin="0,50,0,0" Height="20" VerticalAlignment="Top"/>
+            <Button x:Name="AddCardButton" Content="Add Card" TabIndex="2" IsEnabled="{Binding Items.Count, ConverterParameter=0|8, Converter={StaticResource IntRangeConverter}, ElementName=CardListBox, Mode=OneWay}" Click="AddCardButton_Click" Margin="0,0,0,35" Height="20" VerticalAlignment="Bottom"/>
+            <Button x:Name="SaveSceneButton" Content="Save Scene" TabIndex="2" IsEnabled="{Binding Items.Count, ConverterParameter=0, Converter={StaticResource IntGreaterThanConverter}, ElementName=CardListBox, Mode=OneWay}" Margin="0,0,0,10" Height="20" VerticalAlignment="Bottom" Click="SaveSceneButton_Click"/>
+            <TextBlock HorizontalAlignment="Left" Margin="0,0,0,60" TextWrapping="Wrap" Text="Note: existing ADV scenes will not contain characters added using this tool." VerticalAlignment="Bottom"/>
+        </Grid>
     </Grid>
 </Window>
