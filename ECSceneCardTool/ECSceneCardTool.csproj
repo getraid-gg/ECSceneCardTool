@@ -69,6 +69,7 @@
     </Compile>
     <Compile Include="CardExtractor.cs" />
     <Compile Include="FileManager.cs" />
+    <Compile Include="IntRangeConverter.cs" />
     <Compile Include="IntGreaterThanConverter.cs" />
     <Compile Include="MainWindow.cs" />
     <Compile Include="MainWindow.xaml.cs">
