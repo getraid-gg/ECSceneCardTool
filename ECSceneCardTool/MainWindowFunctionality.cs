@@ -20,7 +20,7 @@ namespace ECSceneCardTool
             }
         }
 
-        private void AppendCard(byte[] cardData)
+        public void AppendCard(byte[] cardData)
         {
             var newSceneData = new byte[SceneData.Length + cardData.Length];
             

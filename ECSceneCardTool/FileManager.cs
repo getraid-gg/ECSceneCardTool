@@ -54,7 +54,7 @@ namespace ECSceneCardTool
             }
         }
 
-        public static byte[] OpenCharacterCard()
+        public static void OpenCharacterCard(MainWindow target)
         {
             var openDialog = new OpenFileDialog()
             {
@@ -69,12 +69,19 @@ namespace ECSceneCardTool
                 {
                     using (var fileReader = new BinaryReader(file))
                     {
-                        return fileReader.ReadBytes((int)file.Length);
+                        var cardBytes = fileReader.ReadBytes((int)file.Length);
+
+                        try
+                        {
+                            target.AppendCard(cardBytes);
+                        }
+                        catch (CardLoadException e)
+                        {
+                            MessageBox.Show($"Failed to load scene: {e.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        }
                     }
                 }
             }
-
-            return null;
         }
 
         public static void SaveCard(byte[] sceneData, CardInfo cardInfo)
