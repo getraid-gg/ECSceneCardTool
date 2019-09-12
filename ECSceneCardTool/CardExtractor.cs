@@ -91,6 +91,23 @@ namespace ECSceneCardTool
 
         public static CardInfo ReadCard(byte[] data, int startIndex)
         {
+            // I'll write an exception logging system someday if I need nicer exception stack trace handling.
+            try
+            {
+                return ReadCardInternal(data, startIndex);
+            }
+            catch (CardLoadException)
+            {
+                throw;
+            }
+            catch
+            {
+                throw new CardLoadException("An unexpected card load error occured. The card may be invalid or corrupt.");
+            }
+        }
+
+        private static CardInfo ReadCardInternal(byte[] data, int startIndex)
+        {
             var pngEndIndex = FindByteSequenceIndex(data, PngEndString, startIndex);
             if (pngEndIndex == -1)
             {
@@ -151,7 +168,7 @@ namespace ECSceneCardTool
                         nameIndex += 5;
                         break;
                     default:
-                        throw new SceneLoadException(new Exception($"Unrecognized string format byte: {nameLengthByte.ToString("X2")}."));
+                        throw new CardLoadException($"Failed to read character name: Unrecognized string format byte: {nameLengthByte.ToString("X2")}.");
                 }
             }
 

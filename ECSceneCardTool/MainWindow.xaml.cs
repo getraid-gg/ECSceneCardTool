@@ -84,7 +84,7 @@ namespace ECSceneCardTool
 
         private void AddCardButton_Click(object sender, RoutedEventArgs e)
         {
-            AppendCard(FileManager.OpenCharacterCard());
+            FileManager.OpenCharacterCard(this);
         }
 
         private void SaveSceneButton_Click(object sender, RoutedEventArgs e)
